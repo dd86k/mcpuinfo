@@ -2,6 +2,8 @@
 
 MCPUINFO is a MS-DOS application used to identify pre-Pentium processors and co-processors currently in use.
 
+Example output: `8086+8087` with a newline.
+
 The list of detected processors and co-processors:
 - 8086
 - 80286
