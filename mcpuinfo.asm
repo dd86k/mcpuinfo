@@ -92,6 +92,7 @@ check_286:
 	jz	case_286	; Jump if FLAGS[15:12] is cleared
 
 ; Detect i386.
+; This checks if we can toggle EFLAGS[AC].
 check_386:
 	pushfd		; Push original EFLAGS
 	pop	eax	; Get ELFAGS
@@ -101,13 +102,13 @@ check_386:
 	popfd		; Replace EFLAGS
 	pushfd		; Get new EFLAGS
 	pop	eax	; Store EFLAGS
-	xor	eax,ecx	; If can't toggle EFLAGS[AC], it is 80386
+	xor	eax,ecx	; If can't toggle AC, it is 80386
 	jz	case_386
 	push	ecx	; Restore EFLAGS
 	popfd
-	jmp	case_486
+	jmp	case_486	; Can toggle AC, it's an 486
 
-; Detect dedicated FPUs such as the 80287 and 80387.
+; Init and check FPU control word.
 check_fpu:
 ;	call	print	; Print what's in DX since we're here
 	fninit		; Resets FPU if present
@@ -115,7 +116,7 @@ check_fpu:
 	cmp	al,0	; Do we have anything?
 	jne	exit	; No FPU then
 
-; Check control word
+; Check if 8087 by checking bit 15 with FDISI.
 ; NOTE: Certainly doesn't seem to work with DosBox-X
 ;check_fpu_cw:
 ;	fnstcw	[fpucw]	; Get FPU status word
@@ -210,18 +211,13 @@ test_delim:
 delim:	ret
 
 ; Skip over leading delimiters
-; Params: SI = Source Index
+; Params: SI = Starting source index
 skip_delim:
-;;	dec	si
-	cld		; 
-;cont:	inc	si
-;	mov	al,ds:[si]
+	cld		; Force set incrementing si
 cont:	lodsb
-;	cmp	al,0dh	; Don't skip if carriage return
-;	je	end
 	call	test_delim
 	jz	cont
-	dec	si
+	dec	si	; Found, real position is one behind
 end:	ret
 
 ;
