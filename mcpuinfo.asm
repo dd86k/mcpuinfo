@@ -14,6 +14,7 @@ ORG	100h	; Origin of CS:0100
 
 %define	VERSION	'0.1.0'
 %define	NL	13,10
+%define	ENDSTR	'$'	; MS-DOS string terminator for AH=4Ch
 
 section .text
 start:
@@ -110,7 +111,6 @@ check_386:
 
 ; Init and check FPU control word.
 check_fpu:
-;	call	print	; Print what's in DX since we're here
 	fninit		; Resets FPU if present
 	fnstsw	ax	; Get FPU status word
 	cmp	al,0	; Do we have anything?
@@ -186,16 +186,17 @@ print:	mov	ah,9
 	int	21h
 	ret
 
-; Program finale
+; Done, print newline and exit
 done:	mov	dx,str_newln
 	call	print
 
-; MS-DOS exit program
+; Exit program (MS-DOS)
 exit:	mov	ah,4ch
 	int	21h
 
 ; Sets zero flag if character a delimiter
-; Params: AL = Character value
+; Params:	AL = Character value
+; Returns:	FLAGS[ZF] is set if true
 test_delim:
 	cmp	al,32	; Space
 	jz	delim
@@ -213,11 +214,11 @@ delim:	ret
 ; Skip over leading delimiters
 ; Params: SI = Starting source index
 skip_delim:
-	cld		; Force set incrementing si
-cont:	lodsb
+	cld		; Force direction (increments SI)
+cont:	lodsb		; Get character as DS:SI
 	call	test_delim
-	jz	cont
-	dec	si	; Found, real position is one behind
+	jz	cont	; If delim, continue
+	dec	si	; Non-delim found, index is behind
 end:	ret
 
 ;
@@ -236,23 +237,24 @@ section .data
 	; DOS strings
 	page_version	db	'mcpuinfo v',VERSION,' (built: ',__DATE__,' ',__TIME__,')',NL,'$'
 	page_ver	db	VERSION,NL,'$'
-	page_help	db	'Print pre-Pentium processor and co-processor type in use.',NL,\
-				'Usage:',NL,\
-				' MCPUINFO [OPTION]',NL,\
-				NL,\
-				'OPTIONS',NL,\
-				' --version    Show version page and quit',NL,\
-				' --ver        Print version string and quit',NL,\
-				' --help, /?   Show this help page and quit',NL,'$'
+	page_help	db	\
+		'Pre-Pentium processor/co-processor information utility.',NL,\
+		'Usage:',NL,\
+		' MCPUINFO [OPTION]',NL,\
+		NL,\
+		'OPTIONS',NL,\
+		' --version    Show version page and quit',NL,\
+		' --ver        Print version string and quit',NL,\
+		' --help, /?   Show this help page and quit',NL,ENDSTR
 	str_newln	db	NL,'$'	; \r\n
-	str_i8086	db	'8086$'
-	str_i286	db	'80286$'
-	str_i386	db	'80386$'
-	str_i486	db	'80486$'
-	str_fpu87	db	'+8087$'
-	str_fpu287	db	'+80287$'
-	str_fpu387	db	'+80387$'
-	str_unknown	db	'unknown$'
+	str_i8086	db	'8086',ENDSTR
+	str_i286	db	'80286',ENDSTR
+	str_i386	db	'80386',ENDSTR
+	str_i486	db	'80486',ENDSTR
+	str_fpu87	db	'+8087',ENDSTR
+	str_fpu287	db	'+80287',ENDSTR
+	str_fpu387	db	'+80387',ENDSTR
+	str_unknown	db	'unknown',ENDSTR
 
 ;
 ; "Stack" section
