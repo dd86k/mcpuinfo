@@ -235,8 +235,8 @@ section .data
 	opt_helpalt	db	'/?'
 	opt_helpaltlen	equ	$-opt_helpalt
 	; DOS strings
-	page_version	db	'mcpuinfo v',VERSION,' (built: ',__DATE__,' ',__TIME__,')',NL,'$'
-	page_ver	db	VERSION,NL,'$'
+	page_version	db	'mcpuinfo ',VERSION,' (built: ',__DATE__,' ',__TIME__,')',NL,ENDSTR
+	page_ver	db	VERSION,NL,ENDSTR
 	page_help	db	\
 		'Pre-Pentium processor/co-processor information utility.',NL,\
 		'Usage:',NL,\
@@ -246,7 +246,7 @@ section .data
 		' --version    Show version page and quit',NL,\
 		' --ver        Print version string and quit',NL,\
 		' --help, /?   Show this help page and quit',NL,ENDSTR
-	str_newln	db	NL,'$'	; \r\n
+	str_newln	db	NL,ENDSTR	; \r\n
 	str_i8086	db	'8086',ENDSTR
 	str_i286	db	'80286',ENDSTR
 	str_i386	db	'80386',ENDSTR
