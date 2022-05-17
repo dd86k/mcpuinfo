@@ -6,6 +6,7 @@
 ;
 ; Compile: nasm mcpuinfo.asm -fbin -omcpuinfo.com
 ; Author: dd86k <dd@dax.moe>
+; License: ISC
 ; ======================================
 
 BITS	16	; Base is 16-bit code
