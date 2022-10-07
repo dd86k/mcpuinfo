@@ -11,7 +11,7 @@
 
 BITS	16	; Base is 16-bit code
 CPU	386	; Contains mixed 16+32-bit code
-ORG	100h	; Origin of CS:0100
+ORG	100h	; Origin of CS:0100 for COM programs
 
 %define	VERSION	'0.1.0'
 %define	NL	13,10
